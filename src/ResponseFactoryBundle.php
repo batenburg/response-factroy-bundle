@@ -2,6 +2,8 @@
 
 namespace Batenburg\ResponseFactoryBundle;
 
-class ResponseFactoryBundle
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+
+class ResponseFactoryBundle extends Bundle
 {
 }
