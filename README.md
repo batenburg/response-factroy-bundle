@@ -64,6 +64,15 @@ An example::
         }
     }
 
+## Note
+To use the constructor injection, you must register the controller in you yaml file::
+    
+    App\Controller\BrandController:
+        tags: ['controller.service_arguments']
+        arguments:
+            $responseFactory: '@batenburg.response_factory_bundle.component.http_foundation.response_factory'
+
+Using dependency injection on a method, will resolved automatically.
 ## License
 
 The Caching Bundle is open-sourced software licensed under the [MIT license](LICENSE.md).
