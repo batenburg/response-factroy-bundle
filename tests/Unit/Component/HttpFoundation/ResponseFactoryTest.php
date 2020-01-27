@@ -552,7 +552,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
@@ -570,7 +573,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
@@ -589,7 +595,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
@@ -608,7 +617,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_INLINE,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
@@ -626,7 +638,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
@@ -645,7 +660,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has('content-disposition'));
-        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $result->headers->get('content-disposition')
+        );
         $this->assertStringContainsString('test.php', $result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
