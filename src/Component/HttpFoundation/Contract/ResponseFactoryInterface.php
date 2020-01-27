@@ -4,7 +4,10 @@ namespace Batenburg\ResponseFactoryBundle\Component\HttpFoundation\Contract;
 
 use Batenburg\ResponseFactoryBundle\Component\HttpFoundation\RedirectResponse;
 use Batenburg\ResponseFactoryBundle\Component\HttpFoundation\Response;
+use SplFileInfo;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 interface ResponseFactoryInterface
 {
@@ -83,4 +86,25 @@ interface ResponseFactoryInterface
         array $headers = [],
         bool $json = false
     ): JsonResponse;
+
+    /**
+     * @param SplFileInfo|string $file
+     * @param array $headers
+     * @return BinaryFileResponse
+     */
+    public function file($file, array $headers = []): BinaryFileResponse;
+
+    /**
+     * @param SplFileInfo|string $file
+     * @param array $headers
+     * @param string|null $fileName
+     * @param string $disposition
+     * @return BinaryFileResponse
+     */
+    public function download(
+        $file,
+        array $headers = [],
+        ?string $fileName = null,
+        string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT
+    ): BinaryFileResponse;
 }

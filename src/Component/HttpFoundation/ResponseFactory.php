@@ -3,7 +3,10 @@
 namespace Batenburg\ResponseFactoryBundle\Component\HttpFoundation;
 
 use Batenburg\ResponseFactoryBundle\Component\HttpFoundation\Contract\ResponseFactoryInterface;
+use SplFileInfo;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -132,5 +135,38 @@ class ResponseFactory implements ResponseFactoryInterface
         bool $json = false
     ): JsonResponse {
         return new JsonResponse($data, $status, $headers, $json);
+    }
+
+    /**
+     * @param SplFileInfo|string $file
+     * @param array $headers
+     * @return BinaryFileResponse
+     */
+    public function file($file, array $headers = []): BinaryFileResponse
+    {
+        return new BinaryFileResponse($file, Response::HTTP_OK, $headers);
+    }
+
+    /**
+     * @param SplFileInfo|string $file
+     * @param array $headers
+     * @param string|null $fileName
+     * @param string $disposition
+     * @return BinaryFileResponse
+     */
+    public function download(
+        $file,
+        array $headers = [],
+        ?string $fileName = null,
+        string $disposition = ResponseHeaderBag::DISPOSITION_ATTACHMENT
+    ): BinaryFileResponse {
+        $response = new BinaryFileResponse($file, Response::HTTP_OK, $headers, true, $disposition);
+
+        $response->setContentDisposition(
+            $disposition,
+            is_null($fileName) ? $response->getFile()->getFilename() : $fileName
+        );
+
+        return $response;
     }
 }

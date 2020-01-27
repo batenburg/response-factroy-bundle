@@ -10,7 +10,10 @@ use Batenburg\ResponseFactoryBundle\Exception\FlashBagNotSetException;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -485,5 +488,195 @@ class ResponseFactoryTest extends TestCase
         // Validate
         $this->assertArrayHasKey($headerKey, $result->headers->all());
         $this->assertEquals($headerValue, $result->headers->get($headerKey));
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::file
+     */
+    public function testFile(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        // Execute
+        $result = $this->responseFactory->file($file);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::file
+     */
+    public function testFileWithCustomHeaders(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        $key = 'content-disposition';
+        $value = 'text/x-php';
+        // Execute
+        $result = $this->responseFactory->file($file, [$key => $value]);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has($key));
+        $this->assertSame($value, $result->headers->get($key));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::file
+     */
+    public function testFileFromPath(): void
+    {
+        // Setup
+        $file = __FILE__;
+        // Execute
+        $result = $this->responseFactory->file($file);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownload(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        // Execute
+        $result = $this->responseFactory->download($file);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadAsInline(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        // Execute
+        $result = $this->responseFactory->download($file, [], null, ResponseHeaderBag::DISPOSITION_INLINE);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadWithOwnFileName(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        $fileName = 'test.php';
+        // Execute
+        $result = $this->responseFactory->download($file, [], $fileName);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testFileWithOwnFileNameAsInline(): void
+    {
+        // Setup
+        $file = new File(__FILE__);
+        $fileName = 'test.php';
+        // Execute
+        $result = $this->responseFactory->download($file, [], $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_INLINE, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadFromPath(): void
+    {
+        // Setup
+        $file = __FILE__;
+        // Execute
+        $result = $this->responseFactory->download($file);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadFromPathWithCustomizedFileName(): void
+    {
+        // Setup
+        $file = __FILE__;
+        $fileName = 'test.php';
+        // Execute
+        $result = $this->responseFactory->download(__FILE__, [], $fileName);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has('content-disposition'));
+        $this->assertStringContainsString(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $result->headers->get('content-disposition'));
+        $this->assertStringContainsString('test.php', $result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadWithCustomHeaders(): void
+    {
+        // Setup
+        $file = __FILE__;
+        $key = 'custom-header';
+        $value = 'text/x-php';
+        // Execute
+        $result = $this->responseFactory->download($file, [$key => $value]);
+        // Validate
+        $this->assertInstanceOf(BinaryFileResponse::class, $result);
+        $this->assertSame(200, $result->getStatusCode());
+        $this->assertTrue($result->headers->has($key));
+        $this->assertSame($value, $result->headers->get($key));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::download
+     */
+    public function testDownloadWhichDoesNotExist(): void
+    {
+        // Exception
+        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        // Execute
+        $this->responseFactory->download('some-file.txt');
     }
 }
