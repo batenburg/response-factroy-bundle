@@ -2,7 +2,7 @@
 
 Response factory for the Symfony Framework.
 
-Build Status: [![Build Status](https://travis-ci.org/doctrine/DoctrineBundle.svg?branch=master)](https://travis-ci.org/batenburg/response-factory-bundle.svg?branch=master)
+Build Status: [![Build Status](https://travis-ci.org/batenburg/response-factroy-bundle.svg?branch=master)](https://travis-ci.org/batenburg/response-factroy-bundle.svg?branch=master)
 
 ## What is Response factory Bundle?
 
