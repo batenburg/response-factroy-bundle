@@ -33,7 +33,7 @@ jobs:
         - composer require symfony/twig-bundle:4.3.* symfony/dependency-injection:4.3.* symfony/framework-bundle:4.3.*
 
     # Test against latest Symfony 4.4 dev
-    - php: 7.3  
+    - php: 7.3
       install:
         - composer require symfony/twig-bundle:4.4.* symfony/dependency-injection:4.4.* symfony/framework-bundle:4.4.*
 
@@ -62,3 +62,5 @@ jobs:
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
       script:
         - ./vendor/bin/phpunit -v --coverage-clover ./build/logs/clover.xml
+      after_script:
+        - php ./vendor/bin/php-coveralls -v
