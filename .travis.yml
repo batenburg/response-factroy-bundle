@@ -41,25 +41,25 @@ jobs:
     - php: 7.4
       install:
         - composer require symfony/twig-bundle:5.0.* symfony/dependency-injection:5.0.* symfony/framework-bundle:5.0.*
-        -
+
     # Test against latest Symfony 5.0 stable
     - php: 7.4
-    install:
-      - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.1.*
+      install:
+        - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.1.*
 
     # Test dev versions
-    - php: 7.3
+    - php: 7.4
       if: type = cron
       install:
         - composer update
 
     - stage: Code Quality
-      php: 7.3
+      php: 7.4
       script:
         - ./vendor/bin/phpcs
 
     - stage: Coverage
-      php: 7.3
+      php: 7.4
       install:
         - composer update
       before_script:
