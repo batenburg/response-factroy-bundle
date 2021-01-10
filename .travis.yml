@@ -68,6 +68,6 @@ jobs:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
       script:
-        - ./vendor/bin/phpunit -v --coverage-clover ./build/logs/clover.xml
+        - ./vendor/bin/phpunit -v --coverage-clover ./clover.xml
       after_script:
         - php coverage-checker.php clover.xml 100
