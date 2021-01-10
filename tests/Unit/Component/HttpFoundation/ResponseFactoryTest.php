@@ -11,6 +11,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -502,7 +503,7 @@ class ResponseFactoryTest extends TestCase
         // Validate
         $this->assertInstanceOf(BinaryFileResponse::class, $result);
         $this->assertSame(200, $result->getStatusCode());
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -521,7 +522,7 @@ class ResponseFactoryTest extends TestCase
         $this->assertSame(200, $result->getStatusCode());
         $this->assertTrue($result->headers->has($key));
         $this->assertSame($value, $result->headers->get($key));
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -554,10 +555,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString(basename(__FILE__), (string)$result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -575,10 +576,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_INLINE,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString(basename(__FILE__), (string)$result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -597,10 +598,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString($fileName, (string)$result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -619,10 +620,10 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_INLINE,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString($fileName, $result->headers->get('content-disposition'));
-        $this->assertStringContainsString($result->getFile()->getFilename(), $file);
+        $this->assertStringContainsString($fileName, (string)$result->headers->get('content-disposition'));
+        $this->assertStringContainsString($result->getFile()->getFilename(), $file->__toString());
     }
 
     /**
@@ -640,9 +641,9 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString(basename(__FILE__), $result->headers->get('content-disposition'));
+        $this->assertStringContainsString(basename(__FILE__), (string)$result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
 
@@ -662,9 +663,9 @@ class ResponseFactoryTest extends TestCase
         $this->assertTrue($result->headers->has('content-disposition'));
         $this->assertStringContainsString(
             ResponseHeaderBag::DISPOSITION_ATTACHMENT,
-            $result->headers->get('content-disposition')
+            (string)$result->headers->get('content-disposition')
         );
-        $this->assertStringContainsString('test.php', $result->headers->get('content-disposition'));
+        $this->assertStringContainsString('test.php', (string)$result->headers->get('content-disposition'));
         $this->assertStringContainsString($result->getFile()->getFilename(), $file);
     }
 
@@ -693,7 +694,7 @@ class ResponseFactoryTest extends TestCase
     public function testDownloadWhichDoesNotExist(): void
     {
         // Exception
-        $this->expectException('Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException');
+        $this->expectException(FileNotFoundException::class);
         // Execute
         $this->responseFactory->download('some-file.txt');
     }
