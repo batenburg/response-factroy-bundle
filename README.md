@@ -4,8 +4,6 @@ Response factory for the Symfony Framework.
 
 Build Status: [![Build Status](https://travis-ci.com/batenburg/response-factroy-bundle.svg?branch=master)](https://travis-ci.org/batenburg/response-factroy-bundle.svg?branch=master)
 
-Code coverage: [![Coverage Status](https://coveralls.io/repos/github/batenburg/response-factroy-bundle/badge.svg?branch=master)](https://coveralls.io/github/batenburg/response-factroy-bundle?branch=master)
-
 ## What is Response factory Bundle?
 
 The response factory bundle is a bundle with a response factory, to make clean code in your Symfony controllers.

@@ -34,7 +34,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function withMessage(string $type, $message): self
     {
-        if (is_null($this->flashBag)) {
+        if (!isset($this->flashBag)) {
             throw new FlashBagNotSetException();
         }
 
@@ -50,7 +50,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function withInput(array $input): self
     {
-        if (is_null($this->flashBag)) {
+        if (!isset($this->flashBag)) {
             throw new FlashBagNotSetException();
         }
 
