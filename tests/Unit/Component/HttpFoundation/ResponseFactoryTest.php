@@ -11,11 +11,17 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MetadataBag;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -40,6 +46,21 @@ class ResponseFactoryTest extends TestCase
     private $urlGenerator;
 
     /**
+     * @var MockObject|RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var MockObject|Session
+     */
+    private $session;
+
+    /**
+     * @var MockObject|SessionInterface
+     */
+    private $customSession;
+
+    /**
      * @var MockObject|FlashBagInterface
      */
     private $flashBag;
@@ -55,8 +76,11 @@ class ResponseFactoryTest extends TestCase
 
         $this->twig            = $this->createMock(Environment::class);
         $this->urlGenerator    = $this->createMock(UrlGeneratorInterface::class);
+        $this->requestStack    = $this->createMock(RequestStack::class);
+        $this->session         = $this->createMock(Session::class);
+        $this->customSession   = $this->createMock(SessionInterface::class);
         $this->flashBag        = $this->createMock(FlashBagInterface::class);
-        $this->responseFactory = new ResponseFactory($this->twig, $this->urlGenerator, $this->flashBag);
+        $this->responseFactory = new ResponseFactory($this->twig, $this->urlGenerator, $this->requestStack);
     }
 
     /**
@@ -325,9 +349,55 @@ class ResponseFactoryTest extends TestCase
         $message = 'this test passed!';
         $url     = 'https://admin.launchdesk.dev';
         // Expectations
+        $this->requestStack->expects($this->once())
+            ->method('getSession')
+            ->willReturn($this->session);
+        $this->session->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($this->flashBag);
         $this->flashBag->expects($this->once())
             ->method('add')
             ->with($type, $message);
+        // Execute
+        $this->responseFactory->redirect($url)
+            ->withMessage($type, $message);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::redirect
+     * @throws FlashBagNotSetException
+     */
+    public function testSetAMessageOnARedirectWithoutSessionGetsCaught(): void
+    {
+        // Setup
+        $type    = 'success';
+        $message = 'this test passed!';
+        $url     = 'https://admin.launchdesk.dev';
+        // Expectations
+        $this->expectException(FlashBagNotSetException::class);
+        $this->requestStack->expects($this->once())
+            ->method('getSession')
+            ->willThrowException(new SessionNotFoundException());
+        // Execute
+        $this->responseFactory->redirect($url)
+            ->withMessage($type, $message);
+    }
+
+    /**
+     * @covers \Batenburg\ResponseFactoryBundle\Component\HttpFoundation\ResponseFactory::redirect
+     * @throws FlashBagNotSetException
+     */
+    public function testSetAMessageOnARedirectWithoutCorrectSessionImplemenation(): void
+    {
+        // Setup
+        $type    = 'success';
+        $message = 'this test passed!';
+        $url     = 'https://admin.launchdesk.dev';
+        // Expectations
+        $this->expectException(FlashBagNotSetException::class);
+        $this->requestStack->expects($this->once())
+            ->method('getSession')
+            ->willReturn($this->customSession);
         // Execute
         $this->responseFactory->redirect($url)
             ->withMessage($type, $message);
@@ -435,6 +505,12 @@ class ResponseFactoryTest extends TestCase
             ->with($route, $parameters)
             ->willReturn($url);
         // Expectations
+        $this->requestStack->expects($this->once())
+            ->method('getSession')
+            ->willReturn($this->session);
+        $this->session->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($this->flashBag);
         $this->flashBag->expects($this->once())
             ->method('add')
             ->with($type, $message);

@@ -5,9 +5,11 @@ namespace Batenburg\ResponseFactoryBundle\Component\HttpFoundation;
 use Batenburg\ResponseFactoryBundle\Component\HttpFoundation\Contract\ResponseFactoryInterface;
 use SplFileInfo;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Exception\SessionNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -28,20 +30,19 @@ class ResponseFactory implements ResponseFactoryInterface
     private $urlGenerator;
 
     /**
-     * @var FlashBagInterface
+     * @var RequestStack
      */
-    private $flashBag;
+    private $requestStack;
 
     /**
      * @param Environment $twig
      * @param UrlGeneratorInterface $urlGenerator
-     * @param FlashBagInterface $flashBag
      */
-    public function __construct(Environment $twig, UrlGeneratorInterface $urlGenerator, FlashBagInterface $flashBag)
+    public function __construct(Environment $twig, UrlGeneratorInterface $urlGenerator, RequestStack $requestStack)
     {
         $this->twig         = $twig;
         $this->urlGenerator = $urlGenerator;
-        $this->flashBag     = $flashBag;
+        $this->requestStack = $requestStack;
     }
 
     /**
@@ -101,8 +102,17 @@ class ResponseFactory implements ResponseFactoryInterface
      */
     public function redirect(string $url, int $status = Response::HTTP_FOUND, array $headers = []): RedirectResponse
     {
-        return (new RedirectResponse($url, $status, $headers))
-            ->setFlashBag($this->flashBag);
+        $response = new RedirectResponse($url, $status, $headers);
+
+        try {
+            $session = $this->requestStack->getSession();
+            if ($session instanceof Session) {
+                $response->setFlashBag($session->getFlashBag());
+            }
+        } catch (SessionNotFoundException $exception) {
+        }
+
+        return $response;
     }
 
     /**

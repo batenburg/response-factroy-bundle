@@ -11,7 +11,7 @@
                 public="false" >
             <argument type="service" key="$twig" id="twig" />
             <argument type="service" key="$urlGenerator" id="router.default" />
-            <argument type="service" key="$flashBag" id="session.flash_bag" />
+            <argument type="service" key="$requestStack" id="request_stack" />
         </service>
         <service
                 id="Batenburg\ResponseFactoryBundle\Component\HttpFoundation\Contract\ResponseFactoryInterface"
