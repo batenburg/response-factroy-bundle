@@ -11,6 +11,7 @@ php:
   - 7.3
   - 7.4
   - 8.0
+  - 8.1
 
 env:
   global:
@@ -43,10 +44,30 @@ jobs:
       install:
         - composer require symfony/twig-bundle:5.0.* symfony/dependency-injection:5.0.* symfony/framework-bundle:5.0.*
 
-    # Test against latest Symfony 5.0 stable
+    # Test against latest Symfony 5.1 stable
     - php: 7.4
       install:
         - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.1.*
+
+    # Test against latest Symfony 5.2 stable
+    - php: 7.4
+      install:
+        - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.2.*
+
+    # Test against latest Symfony 5.3 stable
+    - php: 7.4
+      install:
+        - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.3.*
+
+    # Test against latest Symfony 5.4 stable
+    - php: 7.4
+      install:
+        - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:5.4.*
+
+    # Test against latest Symfony 6.0 stable
+    - php: 7.4
+      install:
+        - composer require symfony/twig-bundle:5.1.* symfony/dependency-injection:5.1.* symfony/framework-bundle:6.0.*
 
     # Test dev versions
     - php: 7.4
